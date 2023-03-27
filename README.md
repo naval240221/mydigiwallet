@@ -33,6 +33,29 @@ This is quick start guide to setup and run the MyDigi Wallet
 
 When you setup a wallet it will take you to a new page which will look like as follows
 
+# Databse Specification
+
+I've used mongodb to serve the application. Introduced two separate collection
+- **`wallets`** To save the information of initialized wallet. It follows these schema
+```
+{
+  "name": String, [required]
+  "balance": Number,
+  "date": Datetime
+}
+createdAt, updatedAt will be auto saved while creating the document
+```
+-  **`transactions`** To save the transaction against a wallet, schema looks like as follows
+```
+{
+  "amount": Number, [required]
+  "type": String, [required] [Can be either of DEBIT/CREDIT]
+  "description": String,
+  "balance": Number,
+  "date": Datetime // Time of transaction
+  "walletId": mongo document id of wallet in which transaction is being performed
+}
+```
 
 # Api Method Description
 
@@ -155,6 +178,11 @@ Get all the transactions relate to a wallet, it supports pagination and sort bas
 ### `GET /download/:walletId`
 
 Downalod a csv file for all transactions
+
+#### request
+```
+http://localhost:8081/download/64209cab5df7692750ed7d0f
+```
 
 #### Response [200]
 ```
