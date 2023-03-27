@@ -27,7 +27,7 @@ function isValidNumber(x, type) {
                     "error": "Number should can have upto 4 digit after decimal"
                 };
             } else {
-                let finalValue = new bigDecimal(x).round(4, bigDecimal.RoundingModes.CEILING)
+                let finalValue = new bigDecimal(x).round(4, bigDecimal.RoundingModes.CEILING);
                 return {
                     "valid": true,
                     "value": parseFloat(finalValue.getValue()),
@@ -161,12 +161,12 @@ module.exports = {
             if (body.type === "CREDIT" && !body.description) {
                 body.description = "Recharge";
             }
-            let finalBalance = bigDecimal.add(new bigDecimal(walletDoc.balance), validBalance.roundedValue)
+            let finalBalance = bigDecimal.add(walletDoc.balance, validBalance.value)
             const transactionData = {
                 amount: validBalance.value,
                 walletId: params.walletId,
                 description: body.description || '',
-                balance: parseFloat(finalBalance.getValue()),
+                balance: parseFloat(finalBalance),
                 type: body.type,
                 date: new Date()
             }
@@ -180,7 +180,7 @@ module.exports = {
             await Wallets.updateOne({
                 _id: new ObjectId(params.walletId)
             }, {
-                'balance': parseFloat(finalBalance.getValue())
+                'balance': parseFloat(finalBalance)
             });
             return res.status(200).json({
                 'balance': transactionDocCreated.balance,
