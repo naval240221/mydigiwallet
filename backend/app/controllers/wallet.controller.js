@@ -26,7 +26,7 @@ function isValidNumber(x, type) {
             } else {
                 return {
                     "valid": true,
-                    "value": parseFloat(x)
+                    "value": parseFloat(parseFloat(x).toFixed(4))
                 };
             }
         }
