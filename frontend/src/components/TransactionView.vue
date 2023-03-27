@@ -85,8 +85,9 @@ export default defineComponent({
                 console.log(e);
             }).finally(() => table.isLoading = false);
 
-
-            WalletDataService.getAllTransaction(walletId, offset, limit, JSON.stringify({order: sort}))
+            const sortOrder = {};
+            sortOrder[order] = sort;
+            WalletDataService.getAllTransaction(walletId, offset, limit, JSON.stringify(sortOrder))
             .then(response => {
                 table.rows = response.data;
                 table.sortable.order = order;
@@ -104,7 +105,7 @@ export default defineComponent({
 
             WalletDataService.downloadToCsv(walletId)
             .then(response => {
-                table.totalRecordCount = response.data.count;
+                console.log(response.data);
             }).catch(e => {
                 console.log(e);
             }).finally(() => table.isLoading = false);
