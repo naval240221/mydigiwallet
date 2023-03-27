@@ -1,5 +1,6 @@
 
 var ObjectId = require('mongoose').Types.ObjectId;
+var bigDecimal = require('js-big-decimal');
 
 const Wallets = require('../models/wallets.model');
 const Transactions = require('../models/transactions.model');
@@ -12,9 +13,11 @@ function isValidNumber(x, type) {
     if (typeof x == 'number' && !isNaN(x)) {
         // check if it is integer
         if (Number.isInteger(x)) {
+            let finalValue = new bigDecimal(x).round(4, bigDecimal.RoundingModes.CEILING);
             return {
                 "valid": true,
-                "value": parseInt(x)
+                "value": parseFloat(finalValue.getValue()),
+                "roundedValue": finalValue
             };
         } else {
             let splitData = x.toString().split('.')
@@ -24,9 +27,11 @@ function isValidNumber(x, type) {
                     "error": "Number should can have upto 4 digit after decimal"
                 };
             } else {
+                let finalValue = new bigDecimal(x).round(4, bigDecimal.RoundingModes.CEILING)
                 return {
                     "valid": true,
-                    "value": parseFloat(parseFloat(x).toFixed(4))
+                    "value": parseFloat(finalValue.getValue()),
+                    "roundedValue": finalValue
                 };
             }
         }
@@ -144,6 +149,7 @@ module.exports = {
             }
             if (body.type === "DEBIT" && validBalance.value > 0) {
                 validBalance.value = -1 * validBalance.value
+                validBalance.roundedValue = validBalance.roundedValue.negate()
             }
             // If transaction is a debit transaction then do validate
             // If a wallet has sufficeint funds
@@ -155,11 +161,12 @@ module.exports = {
             if (body.type === "CREDIT" && !body.description) {
                 body.description = "Recharge";
             }
+            let finalBalance = bigDecimal.add(new bigDecimal(walletDoc.balance), validBalance.roundedValue)
             const transactionData = {
                 amount: validBalance.value,
                 walletId: params.walletId,
                 description: body.description || '',
-                balance: walletDoc.balance + validBalance.value,
+                balance: parseFloat(finalBalance.getValue()),
                 type: body.type,
                 date: new Date()
             }
@@ -173,7 +180,7 @@ module.exports = {
             await Wallets.updateOne({
                 _id: new ObjectId(params.walletId)
             }, {
-                'balance': walletDoc.balance + validBalance.value
+                'balance': parseFloat(finalBalance.getValue())
             });
             return res.status(200).json({
                 'balance': transactionDocCreated.balance,
