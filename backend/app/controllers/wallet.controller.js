@@ -4,6 +4,8 @@ var ObjectId = require('mongoose').Types.ObjectId;
 const Wallets = require('../models/wallets.model');
 const Transactions = require('../models/transactions.model');
 
+const downloadResource = require('../util');
+
 function isValidNumber(x, type) {
     // check if the passed value is a number
     x = Number(x);
@@ -41,7 +43,9 @@ module.exports = {
         try {
             const { name, balance } = req.body;
             if (!name) {
-                res.badRequest("Please provide wallet name to setup an wallet");
+                res.status(400).json({
+                    error: "Please provide wallet name to setup an wallet"
+                });
                 return
             }
             let createBody = {
@@ -50,7 +54,9 @@ module.exports = {
             };
             var validBalance = isValidNumber(balance, 'Balance');
             if (balance && !validBalance.valid) {
-                res.badRequest("Please provide a correct input for balance");
+                res.status(400).json({
+                    error: "Please provide a correct input for balance"
+                });
                 return
             }
             if (validBalance.value) {
@@ -86,7 +92,9 @@ module.exports = {
         try {
             const { params } = req;
             if (!params.id) {
-                res.badRequest("Please provide wallet id to fetch wallet details");
+                res.status(400).json({
+                    error: "Please provide wallet id to fetch wallet details"
+                });
                 return
             }
             const walletData = await Wallets.findOne({
@@ -110,7 +118,9 @@ module.exports = {
         try {
             const { params, body } = req;
             if (!params.walletId) {
-                res.badRequest("Please provide wallet id to fetch wallet details");
+                res.status(400).json({
+                    error: "Please provide wallet id to fetch wallet details"
+                });
                 return
             }
             var validBalance = isValidNumber(body.amount, 'Amount');
@@ -181,7 +191,9 @@ module.exports = {
         try {
             const { query } = req;
             if (!query.walletId) {
-                res.badRequest("Please provide wallet id to fetch transaction for wallet");
+                res.status(400).json({
+                    error: "Please provide wallet id to fetch transaction for wallet"
+                });
                 return
             }
             let limit = parseInt(query.limit) || 10;
@@ -218,7 +230,9 @@ module.exports = {
         try {
             const { query } = req;
             if (!query.walletId) {
-                res.badRequest("Please provide wallet id to fetch transaction for wallet");
+                res.status(400).json({
+                    message: "Please provide wallet id to fetch transaction for wallet"
+                });
                 return
             }
             const walletDoc = await Wallets.findOne({
@@ -237,6 +251,62 @@ module.exports = {
             return res.status(200).json({
                 "count": transactionCount
             })
+        } catch (err) {
+            return res.status(500).json({
+                message: err.message
+            })
+        }
+    },
+
+    downloadTransactionToCsv: async (req, res) => {
+        try {
+            const { params } = req;
+            if (!params.walletId) {
+                res.status(400).json({
+                    message: "Please provide wallet id to fetch transaction for wallet"
+                });
+                return
+            }
+            const walletDoc = await Wallets.findOne({
+                _id: new ObjectId(params.walletId)
+            }, {name: 1, balance: 1})
+            if (!walletDoc) {
+                return res.status(404).json({
+                    error: "Wallet with this wallet id does not exists"
+                })
+            }
+            const transactionQuery = {
+                walletId: new ObjectId(params.walletId),
+                deleted: {'$ne': true}
+            }
+            const fields = [
+                {
+                    label: 'Transaction Id',
+                    value: '_id'
+                },
+                {
+                    label: 'Transaction Date',
+                    value: 'date'
+                },
+                {
+                    label: 'Transaction Amount',
+                    value: 'amount'
+                },
+                {
+                    label: 'Balance Amount',
+                    value: 'balance'
+                },
+                {
+                    label: 'Transaction Type',
+                    value: 'type'
+                },
+                {
+                    label: 'Description',
+                    value: 'description'
+                }
+            ]
+            const transactionsData = await Transactions.find(transactionQuery);
+            downloadResource(res, 'transactions.csv', fields, transactionsData)
         } catch (err) {
             return res.status(500).json({
                 message: err.message

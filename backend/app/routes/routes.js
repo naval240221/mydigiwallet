@@ -18,5 +18,7 @@ module.exports = app => {
     // Get all transactions count
     router.get("/transactions/count", wallets.getAllTransactionCount);
 
+    router.get("/download/:walletId", wallets.downloadTransactionToCsv);
+
     app.use('/', router);
 };
