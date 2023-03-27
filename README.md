@@ -1,4 +1,4 @@
-# myhighlevel-wallet
+# mydigiwallet
 This website let you setup a new wallet and ability to record credit/debit transaction.
 
 # Quick-Start Guide
@@ -11,17 +11,15 @@ This is quick start guide to setup and run the MyDigi Wallet
 
 # Setup
 - Clone the repo
-- Go to folder `myhighlevel-wallet` and run command `npm install` to install all dependencies related to frontend and backend
 - create a .env file in this folder and mention two different env variables
   - **MONGO_URI** uri path to connect to database
-- open a new terminal and go to folder `backend/` and run command `npm run dev`, your sails app should be running at `http://localhost:8081`
-- open another terminal and go to folder `frontend/` and run command `npm run serve`, your Vue.app instance should be running at `http://localhost:8080`
+- open a new terminal and go to folder `backend/` and run command `npm install && node server.js`, your sails app should be running at `http://localhost:8081`
 - open this link [http://localhost:8080/home](http://localhost:8080) into browser 
 
 ## Sample
 This is how your browser window looks like when you visit the page for the first time
 
-![image](https://user-images.githubusercontent.com/128895452/227843761-ecd07077-f1a4-47ba-baf5-c2a0f2d14c6c.png)
+
 
 When you setup a wallet it will take you to a new page which will look like as follows
 
@@ -142,4 +140,13 @@ Get all the transactions relate to a wallet, it supports pagination and sort bas
     "id": "64209cab5df7692750ed7d11"
   }
 ]
+```
+
+### `GET /download/:walletId`
+
+Downalod a csv file for all transactions
+
+#### Response [200]
+```
+Csv File
 ```
