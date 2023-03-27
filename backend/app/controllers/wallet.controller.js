@@ -147,7 +147,6 @@ module.exports = {
             }
             // If transaction is a debit transaction then do validate
             // If a wallet has sufficeint funds
-            console.log(walletDoc.balance, validBalance.value)
             if (body.type === "DEBIT" && (walletDoc.balance + validBalance.value) < 0) {
                 return res.status(400).json({
                     error: "You have insufficent funds in your wallet"
