@@ -7,6 +7,9 @@
         </template>
     </tabledata>
     <div>
+        <v-btn variant="text" color="deep-purple-accent-4" @click="exportData">
+            Export To Csv
+        </v-btn>
         <router-link :to="createTransactionUrl" @navigate="myNavigateHandler">Create Transaction</router-link>
     </div>
 </template>
@@ -95,10 +98,23 @@ export default defineComponent({
         // Get data first
         getDataFromApi(0, 10, 'createdAt', 'desc');
 
+        const exportData = () => {
+            const walletId = route.query.walletId;
+            table.isLoading = true;
+
+            WalletDataService.downloadToCsv(walletId)
+            .then(response => {
+                table.totalRecordCount = response.data.count;
+            }).catch(e => {
+                console.log(e);
+            }).finally(() => table.isLoading = false);
+        };
+
         return {
             table,
             getDataFromApi,
-            createTransactionUrl
+            createTransactionUrl,
+            exportData
         };
     }
 })

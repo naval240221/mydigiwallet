@@ -2,7 +2,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+const path = __dirname + '/app/views/';
+
 const app = express();
+
+app.use(express.static(path));
 
 var corsOptions = {
   origin: "http://localhost:8081"
@@ -30,7 +34,7 @@ db.mongoose
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to mydigiwallet application." });
+  res.sendFile(path + "index.html");
 });
 
 require("./app/routes/routes")(app);

@@ -20,6 +20,10 @@ class WalletDataService {
   getTransactionCount(walletId) {
     return http.get(`/transactions/count?walletId=${walletId}`);
   }
+
+  downloadToCsv(walletId) {
+    return http.get(`/download/${walletId}`);
+  }
 }
 
 export default new WalletDataService();
