@@ -105,7 +105,12 @@ export default defineComponent({
 
             WalletDataService.downloadToCsv(walletId)
             .then(response => {
-                console.log(response.data);
+                const blob = new Blob([response.data], { type: 'text/csv' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = name;
+                link.click();
+                URL.revokeObjectURL(link.href);
             }).catch(e => {
                 console.log(e);
             }).finally(() => table.isLoading = false);
