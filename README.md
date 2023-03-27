@@ -17,8 +17,18 @@ This is quick start guide to setup and run the MyDigi Wallet
 - open this link [http://localhost:8080/home](http://localhost:8080) into browser 
 
 ## Sample
-This is how your browser window looks like when you visit the page for the first time
 
+##### This is how your browser window looks like when you visit the page for the first time
+
+![image](https://user-images.githubusercontent.com/128895452/228024025-45a9240f-8420-4106-b8f1-9f491aaeb26a.png)
+
+##### After a wallet is setup this view will be visible to the user to capture transaction as well see the wallet details
+
+![image](https://user-images.githubusercontent.com/128895452/228023845-9a4da5be-3d5b-4bb7-972c-a0548b34e72a.png)
+
+##### Transactions Table with pagination and Export functionality
+
+![image](https://user-images.githubusercontent.com/128895452/228023535-33d6a7be-a37f-411e-9294-3fd2d541bf77.png)
 
 
 When you setup a wallet it will take you to a new page which will look like as follows
