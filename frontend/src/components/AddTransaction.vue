@@ -1,6 +1,6 @@
 <template v-slot:actions>
     <div class="hello" style="width:100%">
-      <v-form fast-fail @submit.prevent>
+      <v-form fast-fail ref="transactionForm" @submit.prevent>
         <v-card class="mx-auto" max-width="400" title="Make a transaction">
           <v-container>
             <v-sheet class="mx-auto">
@@ -86,6 +86,7 @@
           const walletData = JSON.parse(window.localStorage.getItem('walletData'));
           walletData.balance = response.data.balance
           localStorage.setItem("walletData", JSON.stringify(walletData));
+          this.$refs.transactionForm.reset();
         })
         .catch(e => {
           console.log(e);
