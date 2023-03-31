@@ -30,7 +30,7 @@
     <div style="margin-top:20px;">
       <v-snackbar
         :timeout="2000"
-        color="primary"
+        :color="snackbarcolor"
         variant="tonal"
         v-model="snackbar"
         vertical
@@ -39,7 +39,7 @@
         <p>{{ snackbarmessage  }}</p>
         <template v-slot:actions>
           <v-btn
-            color="indigo"
+            :color="snackbarcolor"
             variant="text"
             @click="snackbar = false"
           >
@@ -60,6 +60,7 @@
     data: () => ({
       snackbar: false,
       snackbartitle: '',
+      snackbarcolor: 'success',
       snackbarmessage: '',
       description: '',
       amount: null,
@@ -85,6 +86,7 @@
         .then(response => {
           this.snackbartitle = "Transaction is succesfull.";
           this.snackbarmessage = `Updated wallet balance is ${response.data.balance}.`;
+          this.snackbarcolor = 'success';
           this.snackbar = true;
           const walletData = JSON.parse(window.localStorage.getItem('walletData'));
           walletData.balance = response.data.balance
@@ -93,9 +95,18 @@
           loader.hide()
         })
         .catch(e => {
-          console.log(e);
+          let errorMessage = e;
+          if (e.request && e.request.response) {
+            try {
+              let errorData = JSON.parse(e.request.response);
+              errorMessage = errorData.error
+            } catch (error) {
+              errorMessage = e.request.response
+            }
+          }
           this.snackbartitle = "Error Occured";
-          this.snackbarmessage = e;
+          this.snackbarmessage = errorMessage;
+          this.snackbarcolor = 'red'
           this.snackbar = true;
           loader.hide()
         }), 2000)

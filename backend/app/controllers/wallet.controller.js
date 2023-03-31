@@ -88,7 +88,7 @@ module.exports = {
             return res.status(200).json(walletData);
         } catch (err) {
             return res.status(500).json({
-                message: err.message
+                error: err.message
             })
         }
     },
@@ -114,7 +114,7 @@ module.exports = {
             return res.status(200).json(walletData)
         } catch (err) {
             return res.status(500).json({
-                message: err.message
+                error: err.message
             })
         }
     },
@@ -161,6 +161,11 @@ module.exports = {
             if (body.type === "CREDIT" && !body.description) {
                 body.description = "Recharge";
             }
+            if (body.type === "DEBIT" && !body.description) {
+                return res.status(400).json({
+                    error: "Description is required field"
+                })
+            }
             let finalBalance = bigDecimal.add(walletDoc.balance, validBalance.value)
             const transactionData = {
                 amount: validBalance.value,
@@ -188,7 +193,7 @@ module.exports = {
             })
         } catch (err) {
             return res.status(500).json({
-                message: err.message
+                error: err.message
             })
         }
     },
@@ -227,7 +232,7 @@ module.exports = {
             return res.status(200).json(transactions)
         } catch (err) {
             return res.status(500).json({
-                message: err.message
+                error: err.message
             })
         }
     },

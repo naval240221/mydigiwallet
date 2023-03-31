@@ -10,6 +10,7 @@ app.use(express.static(path));
 
 var corsOptions = {
   origin: "https://digiwallet.onrender.com/"
+  // origin: "http://localhost:8080"
 };
 
 app.use(cors(corsOptions));

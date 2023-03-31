@@ -14,7 +14,7 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn type="submit" class="flex-grow-1" height="48" variant="tonal" @click="setupWallet">
+          <v-btn type="submit" class="flex-grow-1" height="48" variant="tonal" @click.prevent="setupWallet">
             Setup Wallet
           </v-btn>
         </v-card-actions>
@@ -24,7 +24,7 @@
   <div style="margin-top:20px;">
     <v-snackbar
       :timeout="2000"
-      color="primary"
+      :color="snackbarcolor"
       variant="tonal"
       v-model="snackbar"
       vertical
@@ -33,7 +33,7 @@
       <p>{{ snackbarmessage  }}</p>
       <template v-slot:actions>
         <v-btn
-          color="indigo"
+          :color="snackbarcolor"
           variant="text"
           @click="snackbar = false"
         >
@@ -54,6 +54,7 @@ export default {
     snackbar: false,
     snackbartitle: '',
     snackbarmessage: '',
+    snackbarcolor: 'success',
     name: '',
     walletNameRules: [
       value => !!value || "Wallet name is required",
@@ -67,8 +68,11 @@ export default {
     ],
   }),
   methods: {
-    async setupWallet(e) {
-      e.preventDefault();
+    async setupWallet() {
+      let loader = this.$loading.show({
+        container: null,
+        loader: 'dots'
+      });
       if (!this.name) return alert("Please proivde a wallet name")
       let postData = {
         name: this.name
@@ -76,48 +80,32 @@ export default {
       if (this.balance) {
         postData.balance = this.balance
       }
-      WalletDataService.create(postData)
+      setTimeout(() => WalletDataService.create(postData)
         .then(response => {
+          loader.hide()
           localStorage.setItem("walletData", JSON.stringify(response.data));
           this.snackbartitle = "New wallet seup is succesfull.";
           this.snackbarmessage = "A new wallet " + response.data.name + " has been created succesfully.";
+          this.snackbarcolor = 'success';
           this.snackbar = true;
           this.$router.push({ name: 'wallet', params: { id: response.data.id } })
         })
         .catch(e => {
-          console.log(e);
+          loader.hide()
+          let errorMessage = e;
+          if (e.request && e.request.response) {
+            try {
+              let errorData = JSON.parse(e.request.response);
+              errorMessage = errorData.error
+            } catch (error) {
+              errorMessage = e.request.response
+            }
+          }
           this.snackbartitle = "Error Occured";
-          this.snackbarmessage = e;
+          this.snackbarmessage = errorMessage;
+          this.snackbarcolor = 'red';
           this.snackbar = true;
-        });
-      // try {
-      //   const response = await axios.post('/setup', postData);
-      //   localStorage.setItem("walletData", JSON.stringify(response.data));
-      //   this.snackbartitle = "New wallet seup is succesfull.";
-      //   this.snackbarmessage = "A new wallet " + response.data.name + " has been created succesfully.";
-      //   this.snackbar = true;
-      //   this.$router.push({ name: 'wallet', params: { id: response.data.id } })
-      // } catch (error) {
-      //   let errorMessage = "";
-      //   if (error.response) {
-      //     if (error.response.data && error.response.data.message) {
-      //       if (/duplicate/.test(error.response.data.message)) {
-      //         errorMessage = "A wallet is already exists with the same name";
-      //       } else {
-      //         errorMessage = error.response.data.message;
-      //       }
-      //     } else {
-      //       errorMessage = error.response.data;
-      //     }
-      //   } else if (error.request) {
-      //     errorMessage = error.request;
-      //   } else {
-      //     errorMessage = error.message;
-      //   }
-      //   this.snackbartitle = "Error Occured";
-      //   this.snackbarmessage = errorMessage;
-      //   this.snackbar = true;
-      // }
+        }), 2000)
     }
   }
 }
