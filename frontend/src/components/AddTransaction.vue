@@ -20,7 +20,7 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn type="submit" class="flex-grow-1" height="48" variant="tonal" @click="addTransaction">
+            <v-btn type="submit" class="flex-grow-1" height="48" variant="tonal" @click.prevent="addTransaction">
               New Transaction
             </v-btn>
           </v-card-actions>
@@ -70,15 +70,18 @@
       type: 'CREDIT'
     }),
     methods: {
-      async addTransaction(e) {
-        e.preventDefault();
+      async addTransaction() {
+        let loader = this.$loading.show({
+          container: null,
+          loader: 'dots'
+        });
         if (!this.amount || isNaN(this.amount)) return alert("Please proivde a wallet name")
         let postData = {
           amount: this.amount,
           type: this.type,
           description: this.description
         };
-        WalletDataService.createtransaction(this.walletId, postData)
+        setTimeout(() => WalletDataService.createtransaction(this.walletId, postData)
         .then(response => {
           this.snackbartitle = "Transaction is succesfull.";
           this.snackbarmessage = `Updated wallet balance is ${response.data.balance}.`;
@@ -87,13 +90,15 @@
           walletData.balance = response.data.balance
           localStorage.setItem("walletData", JSON.stringify(walletData));
           this.$refs.transactionForm.reset();
+          loader.hide()
         })
         .catch(e => {
           console.log(e);
           this.snackbartitle = "Error Occured";
           this.snackbarmessage = e;
           this.snackbar = true;
-        });
+          loader.hide()
+        }), 2000)
       }
     }
   }
