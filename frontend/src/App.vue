@@ -19,3 +19,7 @@
     name: "app"
   };
 </script>
+
+<head>
+  <meta name="trustpilot-one-time-domain-verification-id" content="a6c91f0e-a37a-4535-a4c4-b6febac4332a"/>
+</head>
